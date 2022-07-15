@@ -1,7 +1,39 @@
 <html>
-  <head></head>
+  <head>
+    <style>
+      canvas {
+        width: calc(100%);
+        height: calc(100%);
+      }
+    </style>
+  </head>
   <body>
     js13kgames-2022
-    <script></script>
+    <canvas></canvas>
+    <script>
+      let canvas = document.getElementsByTagName('canvas')[0]
+      let context = canvas.getContext('2d')
+      let hero = {}
+      hero.height = 25
+      hero.posx = 0
+      hero.posy = 0
+
+      function draw(){
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.font = hero.height + 'px serif'
+        context.strokeStyle = 'black' 
+
+        context.fillText('😀', hero.posx,hero.posy+hero.height-3)
+        context.rect(hero.posx,hero.posy,hero.height,hero.height)
+        context.stroke()
+      }
+
+      document.addEventListener('keypress',(e) => {
+        hero.posx++;
+        draw()
+      })
+
+      draw()
+    </script>
   </body>
 </html>

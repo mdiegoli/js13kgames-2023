@@ -1,39 +1,56 @@
 <html>
   <head>
     <style>
-      canvas {
-        width: calc(100%);
-        height: calc(100%);
-      }
+      * { margin:0; padding:0; } /* to remove the top and left whitespace */
     </style>
+    <title>JS13KGAMES 2022</title>
+
   </head>
   <body>
-    js13kgames-2022
-    <canvas></canvas>
+    <canvas id="myCanvas"></canvas>
     <script>
-      let canvas = document.getElementsByTagName('canvas')[0]
+      let canvas = document.getElementById('myCanvas')
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      canvas.globalAlpha = 1
       let context = canvas.getContext('2d')
-      let hero = {}
-      hero.height = 25
-      hero.posx = 0
-      hero.posy = 0
+      class Hero{
+        constructor(){
+          this.height = 25
+          this.posx = 0
+          this.posy = canvas.height-this.height
+          this.dir=''
+        }
+      
+        draw = function(){
+          context.font = this.height + 'px serif'
+          context.strokeStyle = 'black' 
+          
 
-      function draw(){
-        context.clearRect(0, 0, canvas.width, canvas.height)
-        context.font = hero.height + 'px serif'
-        context.strokeStyle = 'black' 
+          context.fillText('😀', this.posx-4,this.posy+this.height-3)
+          context.rect(this.posx,this.posy,this.height,this.height)
+          context.stroke()
+        }
 
-        context.fillText('😀', hero.posx,hero.posy+hero.height-3)
-        context.rect(hero.posx,hero.posy,hero.height,hero.height)
-        context.stroke()
+      }
+      let sprites = []
+      let hero = new Hero()
+      sprites.push(hero)
+      
+      function draw(frame){
+        canvas.width = canvas.width
+        sprites.forEach(e => e.draw())
+        requestAnimationFrame(draw)
       }
 
-      document.addEventListener('keypress',(e) => {
+      function keypress(e){
+        //qui setterò la direzione: ci penserà poi la funzione draw a modificare la posizione
         hero.posx++;
-        draw()
-      })
+      }
 
-      draw()
+      window.addEventListener('keydown',keypress)
+
+      requestAnimationFrame(draw)
     </script>
   </body>
 </html>

@@ -14,8 +14,58 @@
       canvas.height = window.innerHeight
       canvas.globalAlpha = 1
       let context = canvas.getContext('2d')
-      class Hero{
+      var level = []
+      class Sprite{
         constructor(){
+          this.velocity=5
+          this.dir=''
+        }
+        //comunica anche se si sta usendo dalla scena
+        collision(r1,r2){
+          if (r1.posx < r2.posx + r2.height &&
+              r1.posx + r1.height > r2.posx &&
+              r1.posy < r2.posy + r2.height &&
+              r1.height + r1.posy > r2.posy) {
+            }
+        }
+        hit(x,y){
+          if (x<0||y<0||x>canvas.width||y>canvas.height) return true
+          for(let s = 0,l = level.length;s<l;s++){
+            let ret = this.collision(this,level[s])
+            if(ret) {
+              console.log('collision between hero and level sprite #'+s)
+              return true
+            }
+          }
+          for(let s = 0,l = sprites.length;s<l;s++){
+            if(s!=this.number){
+              let ret = this.collision(this,sprites[s])
+              if(ret) {
+                console.log('collision between hero and hero sprite #'+s)
+                return true
+              }
+            }
+            
+          }
+          return false
+          
+        }
+        up(){
+          if (!this.hit(this.posx,this.posy-5)) this.posy-=5
+        }
+        down(){
+          if (!this.hit(this.posx,this.posy+5)) this.posy+=5
+        }
+        right(){
+          if (!this.hit(this.posx+5,this.posy)) this.posx+=5
+        }
+        left(){
+          if (!this.hit(this.posx-5,this.posy)) this.posx-=5
+        }
+      }
+      class Hero extends Sprite{
+        constructor(){
+          super()
           this.height = 25
           this.posx = 0
           this.posy = canvas.height-this.height
@@ -25,7 +75,19 @@
         draw = function(){
           context.font = this.height + 'px serif'
           context.strokeStyle = 'black' 
-          
+          switch(this.dir){
+            case 'u':
+              this.up()
+              break
+            case 'd':
+              this.down()
+              break
+            case 'r':
+              this.right()
+              break
+            case 'l':
+              this.left()
+          }         
 
           context.fillText('😀', this.posx-4,this.posy+this.height-3)
           context.rect(this.posx,this.posy,this.height,this.height)
@@ -36,6 +98,7 @@
       let sprites = []
       let hero = new Hero()
       sprites.push(hero)
+      hero.number = sprites.length
       
       function draw(frame){
         canvas.width = canvas.width
@@ -43,12 +106,31 @@
         requestAnimationFrame(draw)
       }
 
-      function keypress(e){
-        //qui setterò la direzione: ci penserà poi la funzione draw a modificare la posizione
-        hero.posx++;
+      function keydown(e){
+        e = e || window.event;
+
+        if (e.keyCode == '38') {
+            hero.dir = 'u'// up arrow
+        }
+        else if (e.keyCode == '40') {
+            hero.dir = 'd'// down arrow
+        }
+        else if (e.keyCode == '37') {
+            hero.dir = 'l'// left arrow
+        }
+        else if (e.keyCode == '39') {
+            hero.dir = 'r'// right arrow
+        }
       }
 
-      window.addEventListener('keydown',keypress)
+      function keyup(e){
+        e = e || window.event;
+
+        hero.dir = ''
+      }
+
+      window.addEventListener('keydown',keydown)
+      window.addEventListener('keyup',keyup)
 
       requestAnimationFrame(draw)
     </script>

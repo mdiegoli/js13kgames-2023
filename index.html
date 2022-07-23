@@ -15,6 +15,13 @@
       canvas.globalAlpha = 1
       let context = canvas.getContext('2d')
       var level = []
+      function Utils(){
+        return {
+          random: function(from,to){
+            return Math.floor(Math.random() * (to - from + 1) + from)
+          }
+        }
+      }
       class Sprite{
         constructor(){
           this.velocity=5
@@ -22,23 +29,26 @@
         }
         //comunica anche se si sta usendo dalla scena
         collision(r1,r2){
-          if (r1.posx < r2.posx + r2.height &&
-              r1.posx + r1.height > r2.posx &&
-              r1.posy < r2.posy + r2.height &&
-              r1.height + r1.posy > r2.posy) {
+          if (r1.posx < r2.posx + r2.size &&
+              r1.posx + r1.size > r2.posx &&
+              r1.posy < r2.posy + r2.size &&
+              r1.size + r1.posy > r2.posy) {
+                return true
+            }else{
+              return false
             }
         }
         hit(x,y){
           if (x<0||y<0||x>canvas.width||y>canvas.height) return true
           for(let s = 0,l = level.length;s<l;s++){
-            let ret = this.collision(this,level[s])
+            let ret = this.collision(level[s],this)
             if(ret) {
               console.log('collision between hero and level sprite #'+s)
               return true
             }
           }
           for(let s = 0,l = sprites.length;s<l;s++){
-            if(s!=this.number){
+            if(s!=this.arrayIndex){
               let ret = this.collision(this,sprites[s])
               if(ret) {
                 console.log('collision between hero and hero sprite #'+s)
@@ -52,29 +62,54 @@
         }
         up(){
           if (!this.hit(this.posx,this.posy-5)) this.posy-=5
+          else this.posy+=5
         }
         down(){
           if (!this.hit(this.posx,this.posy+5)) this.posy+=5
+          else this.posy-=5
         }
         right(){
           if (!this.hit(this.posx+5,this.posy)) this.posx+=5
+          else this.posx-=5
         }
         left(){
           if (!this.hit(this.posx-5,this.posy)) this.posx-=5
+          else this.posx+=5
         }
+        updatePosition(){}
+        draw = function(){
+          context.font = this.size + 'px serif'
+          context.strokeStyle = 'black' 
+          this.updatePosition()         
+          this.drawSprite()
+        }
+        drawSprite(){
+          context.fillText(this.emoji, this.posx-4,this.posy+this.size-3)
+          context.rect(this.posx,this.posy,this.size,this.size)
+          context.stroke()
+        }
+      }
+      class BrownSquare extends Sprite{
+        constructor(){
+          super()
+          this.size = 25
+          this.posy = Utils().random(0,canvas.height-this.size)
+          this.posx = Utils().random(0,canvas.width-this.size)
+          this.emoji = '🟫'
+        }
+        
       }
       class Hero extends Sprite{
         constructor(){
           super()
-          this.height = 25
+          this.size = 25
           this.posx = 0
-          this.posy = canvas.height-this.height
+          this.posy = canvas.height-this.size
           this.dir=''
+          this.emoji = '😀'
         }
       
-        draw = function(){
-          context.font = this.height + 'px serif'
-          context.strokeStyle = 'black' 
+        updatePosition = function(){
           switch(this.dir){
             case 'u':
               this.up()
@@ -88,20 +123,18 @@
             case 'l':
               this.left()
           }         
-
-          context.fillText('😀', this.posx-4,this.posy+this.height-3)
-          context.rect(this.posx,this.posy,this.height,this.height)
-          context.stroke()
         }
 
       }
       let sprites = []
       let hero = new Hero()
       sprites.push(hero)
-      hero.number = sprites.length
+      level.push(new BrownSquare())
+      hero.arrayIndex = sprites.length-1
       
       function draw(frame){
         canvas.width = canvas.width
+        level.forEach(e => e.draw())
         sprites.forEach(e => e.draw())
         requestAnimationFrame(draw)
       }

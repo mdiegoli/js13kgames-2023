@@ -29,21 +29,21 @@
           this.dir=''
         }
         //comunica anche se si sta usendo dalla scena
-        collision(r1,r2){
-          if (r1.posx < r2.posx + r2.size &&
-              r1.posx + r1.size > r2.posx &&
-              r1.posy < r2.posy + r2.size &&
-              r1.size + r1.posy > r2.posy) {
+        collision(r1,x,y,s){
+          if ((r1.posx < (x + s)) &&
+              ((r1.posx + r1.size) > x) &&
+              (r1.posy < (y + s)) &&
+              ((r1.size + r1.posy) > y)) {
                 return true
             }else{
               return false
             }
         }
         hit(x,y){
-          if (x<0||y<0||x>canvas.width||y>canvas.height) return true
+          if (x<0||y<0||x>(Math.trunc(canvas.width/this.size)*this.size)||y>((Math.trunc(canvas.height/this.size))*this.size)) return true
           for(let s = 0,l = level.length;s<l;s++){
 
-            let ret = this.collision(level[s],this)
+            let ret = this.collision(level[s],x,y,this.size)
             if(ret) {
               console.log('collision between hero and level sprite #'+s)
               return true
@@ -51,7 +51,7 @@
           }
           for(let s = 0,l = sprites.length;s<l;s++){
             if(s!=this.arrayIndex){
-              let ret = this.collision(this,sprites[s])
+              let ret = this.collision(sprites[s],x,y,this.size)
               if(ret) {
                 console.log('collision between hero and hero sprite #'+s)
                 return true
@@ -63,19 +63,39 @@
           
         }
         up(){
-          if (!this.hit(this.posx,this.posy-this.vel-1)) this.posy-=this.vel
+          if (!this.hit(this.posx,this.posy-this.vel)){
+            this.defaultEmoji()
+            this.posy-=this.vel
+          }else{
+            this.hitEmoji()
+          }
           //else this.posy+=5
         }
         down(){
-          if (!this.hit(this.posx,this.posy+this.vel+1)) this.posy+=this.vel
+          if (!this.hit(this.posx,this.posy+this.vel)){
+            this.defaultEmoji()
+            this.posy+=this.vel
+          }else{
+            this.hitEmoji()
+          }
           //else this.posy-=5
         }
         right(){
-          if (!this.hit(this.posx+this.vel+1,this.posy)) this.posx+=this.vel
+          if (!this.hit(this.posx+this.vel,this.posy)){
+            this.defaultEmoji()
+            this.posx+=this.vel
+          }else{
+            this.hitEmoji()
+          }
           //else this.posx-=5
         }
         left(){
-          if (!this.hit(this.posx-this.vel-1,this.posy)) this.posx-=this.vel
+          if (!this.hit(this.posx-this.vel,this.posy)){
+            this.defaultEmoji()
+            this.posx-=this.vel
+          }else{
+            this.hitEmoji()
+          }
           //else this.posx+=5
         }
         updatePosition(){}
@@ -95,8 +115,8 @@
         constructor(){
           super()
           this.size = emojiSize
-          this.posy = Utils().random(0,canvas.height/this.size-1)*this.size
-          this.posx = Utils().random(0,canvas.width/this.size-1)*this.size
+          this.posy = Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '🟫'
         }
         
@@ -110,7 +130,12 @@
           this.dir=''
           this.emoji = '😀'
         }
-      
+        defaultEmoji(){
+          this.emoji = '😀'
+        }
+        hitEmoji(){
+          this.emoji = '😵'
+        }
         updatePosition = function(){
           switch(this.dir){
             case 'u':
@@ -135,11 +160,11 @@
       level.push(new BrownSquare())
       hero.arrayIndex = sprites.length-1
       
-      function draw(frame){
+      function gameDraw(frame){
         canvas.width = canvas.width
         level.forEach(e => e.draw())
         sprites.forEach(e => e.draw())
-        requestAnimationFrame(draw)
+        requestAnimationFrame(gameDraw)
       }
 
       function keydown(e){
@@ -168,7 +193,7 @@
       window.addEventListener('keydown',keydown)
       window.addEventListener('keyup',keyup)
 
-      requestAnimationFrame(draw)
+      requestAnimationFrame(gameDraw)
     </script>
   </body>
 </html>

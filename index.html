@@ -111,6 +111,17 @@
           context.stroke()
         }
       }
+      
+      class WaterDrop extends Sprite{
+        constructor(){
+          super()
+          this.size = emojiSize
+          this.posy = Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
+          this.emoji = '💧'
+        }
+        
+      }
       class BrownSquare extends Sprite{
         constructor(){
           super()
@@ -158,6 +169,7 @@
       let hero = new Hero()
       sprites.push(hero)
       level.push(new BrownSquare())
+      level.push(new WaterDrop())
       hero.arrayIndex = sprites.length-1
       
       function gameDraw(frame){

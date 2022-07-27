@@ -120,7 +120,11 @@
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '💧'
         }
-        
+        drawSprite(){
+          context.fillText(this.emoji, this.posx-4,this.posy+this.size-3)
+          context.rect(this.posx,this.posy,this.size,this.size)
+          context.stroke()
+        }
       }
       class BrownSquare extends Sprite{
         constructor(){

@@ -10,10 +10,12 @@
     <canvas id="myCanvas"></canvas>
     <script>
       let canvas = document.getElementById('myCanvas')
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
       canvas.globalAlpha = 1
       let emojiSize = 25
+      canvas.n_sprites_h = Math.trunc(window.innerHeight/emojiSize)
+      canvas.n_sprites_w = Math.trunc(window.innerWidth/emojiSize)
+      canvas.width = canvas.n_sprites_w * emojiSize
+      canvas.height = canvas.n_sprites_h * emojiSize
       let context = canvas.getContext('2d')
       var level = []
       function Utils(){
@@ -40,9 +42,14 @@
             }
         }
         hit(x,y){
-          if (x<0||y<0||x>(Math.trunc(canvas.width/this.size)*this.size)||y>((Math.trunc(canvas.height/this.size))*this.size)) return true
+          if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return true
+          let onStair = false; //use this variable to check if goUpAndDown is setted because I'm on stair or if it was setted previously
           for(let s = 0,l = level.length;s<l;s++){
-
+            if (level[s].canGoThrough) { 
+              this.goUpAndDown = true; 
+              onStair = true;  
+              return false 
+            }
             let ret = this.collision(level[s],x,y,this.size)
             if(ret) {
               console.log('collision between hero and level sprite #'+s)
@@ -59,6 +66,7 @@
             }
             
           }
+          if(this.goUpAndDown && !onStair) delete this.goUpAndDown
           return false
           
         }
@@ -98,6 +106,21 @@
           }
           //else this.posx+=5
         }
+        jump(){
+          if (this.j) {
+            if (!this.iterator) this.iterator = this.jumpSizeYield(0)
+            let jv = this.iterator.next().value
+            if(jv) { 
+              if (!this.hit(this.posx,this.posy+jv)){
+                this.posy+=jv 
+              }
+            }
+            else {
+              delete this.iterator
+              delete this.j
+            }
+          }
+        }
         updatePosition(){}
         draw = function(){
           context.font = this.size + 'px serif'
@@ -116,7 +139,7 @@
         constructor(){
           super()
           this.size = emojiSize
-          this.posy = Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '💧'
         }
@@ -126,11 +149,22 @@
           context.stroke()
         }
       }
+      class Stair extends Sprite{
+        constructor(){
+          super()
+          this.size = emojiSize
+          this.canGoThrough=true
+          this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
+          this.emoji = '🪜'
+        }
+      }
+      
       class BrownSquare extends Sprite{
         constructor(){
           super()
           this.size = emojiSize
-          this.posy = Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '🟫'
         }
@@ -144,6 +178,16 @@
           this.posy = canvas.height-this.size
           this.dir=''
           this.emoji = '😀'
+          this.jumpSize = [-15,-10,-5,-2,-1,-1,-1,1,1,1,2,5,10,15]
+          
+          this.jumpSizeYield = function*(index) {
+            while (index < this.jumpSize.length) {
+              yield this.jumpSize[index]
+              index++
+            }
+          }
+          
+
         }
         defaultEmoji(){
           this.emoji = '😀'
@@ -165,7 +209,14 @@
             case 'l':
               this.left()
               break
-          }         
+          }
+          if (this.j) {
+            this.jump()
+          }else{
+            if(this.dir != 'u') this.down()
+          }    
+          
+              
         }
 
       }
@@ -174,6 +225,8 @@
       sprites.push(hero)
       level.push(new BrownSquare())
       level.push(new WaterDrop())
+      level.push(new Stair())
+
       hero.arrayIndex = sprites.length-1
       
       function gameDraw(frame){
@@ -198,12 +251,17 @@
         else if (e.keyCode == '39') {
             hero.dir = 'r'// right arrow
         }
+        else if (e.keyCode == '32') {
+            hero.j = 'y'// jump arrow
+            hero.js = hero.jumpSize //counter to jump up
+            hero.jsd = hero.jumpSize //counter to jump down
+        }
       }
 
       function keyup(e){
         e = e || window.event;
 
-        hero.dir = ''
+        if(e.keyCode != 32)hero.dir = ''
       }
 
       window.addEventListener('keydown',keydown)

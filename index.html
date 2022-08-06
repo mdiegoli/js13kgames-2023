@@ -42,18 +42,18 @@
             }
         }
         hit(x,y){
-          if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return true
+          if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return {emoji:this.emoji,ret:true}
           let onStair = false; //use this variable to check if goUpAndDown is setted because I'm on stair or if it was setted previously
           for(let s = 0,l = level.length;s<l;s++){
             if (level[s].canGoThrough) { 
               this.goUpAndDown = true; 
               onStair = true;  
-              return false 
+              return {emoji:this.emoji,ret:false}
             }
             let ret = this.collision(level[s],x,y,this.size)
             if(ret) {
               console.log('collision between hero and level sprite #'+s)
-              return true
+              return {emoji:level[s].reaction[`${this.emoji}`] ?? '😵',ret:true}
             }
           }
           for(let s = 0,l = sprites.length;s<l;s++){
@@ -61,48 +61,52 @@
               let ret = this.collision(sprites[s],x,y,this.size)
               if(ret) {
                 console.log('collision between hero and hero sprite #'+s)
-                return true
+                return {emoji:this.emoji,ret:true}
               }
             }
             
           }
           if(this.goUpAndDown && !onStair) delete this.goUpAndDown
-          return false
+          return {emoji:this.emoji,ret:false}
           
         }
         up(){
-          if (!this.hit(this.posx,this.posy-this.vel)){
+          let ret = this.hit(this.posx,this.posy-this.vel)
+          if (ret.ret == false){
             this.defaultEmoji()
             this.posy-=this.vel
           }else{
-            this.hitEmoji()
+            this.emoji = ret.emoji
           }
           //else this.posy+=5
         }
         down(){
-          if (!this.hit(this.posx,this.posy+this.vel)){
+          let ret = this.hit(this.posx,this.posy+this.vel)
+          if (ret.ret == false){
             this.defaultEmoji()
             this.posy+=this.vel
           }else{
-            this.hitEmoji()
+            this.emoji = ret.emoji
           }
           //else this.posy-=5
         }
         right(){
-          if (!this.hit(this.posx+this.vel,this.posy)){
+          let ret = this.hit(this.posx+this.vel,this.posy)
+          if (ret.ret == false){
             this.defaultEmoji()
             this.posx+=this.vel
           }else{
-            this.hitEmoji()
+            this.emoji = ret.emoji
           }
           //else this.posx-=5
         }
         left(){
-          if (!this.hit(this.posx-this.vel,this.posy)){
+          let ret = this.hit(this.posx-this.vel,this.posy)
+          if (ret.ret == false){
             this.defaultEmoji()
             this.posx-=this.vel
           }else{
-            this.hitEmoji()
+            this.emoji = ret.emoji
           }
           //else this.posx+=5
         }
@@ -110,9 +114,12 @@
           if (this.j) {
             if (!this.iterator) this.iterator = this.jumpSizeYield(0)
             let jv = this.iterator.next().value
-            if(jv) { 
-              if (!this.hit(this.posx,this.posy+jv)){
+            if(jv) {
+              let ret = this.hit(this.posx,this.posy+jv) 
+              if (ret.ret == false){
                 this.posy+=jv 
+              }else{
+                this.emoji = ret.emoji
               }
             }
             else {
@@ -167,6 +174,7 @@
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '🟫'
+          this.reaction = {'😀':'😵'}
         }
         
       }
@@ -224,7 +232,7 @@
       let hero = new Hero()
       sprites.push(hero)
       level.push(new BrownSquare())
-      level.push(new WaterDrop())
+      //level.push(new WaterDrop())
       level.push(new Stair())
 
       hero.arrayIndex = sprites.length-1

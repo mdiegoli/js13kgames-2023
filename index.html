@@ -29,6 +29,9 @@
         constructor(){
           this.vel=5
           this.dir=''
+          this.visible=true
+          this.ts=0
+          this.timeEffect=0
         }
         //comunica anche se si sta usendo dalla scena
         collision(r1,x,y,s){
@@ -41,20 +44,26 @@
               return false
             }
         }
+        hitReaction(){}
+        getHitEmoji(){}
         hit(x,y){
           if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return {emoji:this.emoji,ret:true}
           let onStair = false; //use this variable to check if goUpAndDown is setted because I'm on stair or if it was setted previously
           for(let s = 0,l = level.length;s<l;s++){
-            if (level[s].canGoThrough) { 
-              this.goUpAndDown = true; 
-              onStair = true;  
-              return {emoji:this.emoji,ret:false}
+            if (level[s].visible){
+              if (level[s].canGoThrough) { 
+                this.goUpAndDown = true; 
+                onStair = true;  
+                return {emoji:this.emoji,ret:false}
+              }
+              let ret = this.collision(level[s],x,y,this.size)
+              if(ret) {
+                console.log('collision between hero and level sprite #'+s)
+                level[s].hitReaction()
+                return {emoji:level[s].getHitEmoji(this),ret:true}
+              }
             }
-            let ret = this.collision(level[s],x,y,this.size)
-            if(ret) {
-              console.log('collision between hero and level sprite #'+s)
-              return {emoji:level[s].reaction[`${this.emoji}`] ?? '😵',ret:true}
-            }
+            
           }
           for(let s = 0,l = sprites.length;s<l;s++){
             if(s!=this.arrayIndex){
@@ -73,7 +82,7 @@
         up(){
           let ret = this.hit(this.posx,this.posy-this.vel)
           if (ret.ret == false){
-            this.defaultEmoji()
+            //this.defaultEmoji()
             this.posy-=this.vel
           }else{
             this.emoji = ret.emoji
@@ -83,30 +92,33 @@
         down(){
           let ret = this.hit(this.posx,this.posy+this.vel)
           if (ret.ret == false){
-            this.defaultEmoji()
+            //this.defaultEmoji()
             this.posy+=this.vel
           }else{
             this.emoji = ret.emoji
+
           }
           //else this.posy-=5
         }
         right(){
           let ret = this.hit(this.posx+this.vel,this.posy)
           if (ret.ret == false){
-            this.defaultEmoji()
+            //this.defaultEmoji()
             this.posx+=this.vel
           }else{
             this.emoji = ret.emoji
+
           }
           //else this.posx-=5
         }
         left(){
           let ret = this.hit(this.posx-this.vel,this.posy)
           if (ret.ret == false){
-            this.defaultEmoji()
+            //this.defaultEmoji()
             this.posx-=this.vel
           }else{
             this.emoji = ret.emoji
+
           }
           //else this.posx+=5
         }
@@ -120,6 +132,7 @@
                 this.posy+=jv 
               }else{
                 this.emoji = ret.emoji
+
               }
             }
             else {
@@ -136,6 +149,11 @@
           this.drawSprite()
         }
         drawSprite(){
+          if(this.ts){
+            let now = Date.now()
+            let diff = now-this.ts
+            if(Math.round(diff/1000)>this.timeEffect) this.emoji = this.defaultEmoji()
+          }
           context.fillText(this.emoji, this.posx-4,this.posy+this.size-3)
           context.rect(this.posx,this.posy,this.size,this.size)
           context.stroke()
@@ -149,6 +167,17 @@
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
           this.emoji = '💧'
+          this.reaction = {'😀':'💦'}
+        }
+        hitReaction(){
+          this.visible=false
+        }
+        getHitEmoji(o){
+          if(o instanceof Hero){
+            o.ts = Date.now()
+            o.timeEffect = 2
+            return '💦'
+          }
         }
         drawSprite(){
           context.fillText(this.emoji, this.posx,this.posy+this.size-3)
@@ -176,7 +205,13 @@
           this.emoji = '🟫'
           this.reaction = {'😀':'😵'}
         }
-        
+        getHitEmoji(o){
+          if(o instanceof Hero){
+            o.ts=Date.now()
+            o.timeEffect = 3
+            return '😵'
+          }
+        }
       }
       class Hero extends Sprite{
         constructor(){
@@ -198,7 +233,7 @@
 
         }
         defaultEmoji(){
-          this.emoji = '😀'
+          return '😀'
         }
         hitEmoji(){
           this.emoji = '😵'
@@ -232,14 +267,14 @@
       let hero = new Hero()
       sprites.push(hero)
       level.push(new BrownSquare())
-      //level.push(new WaterDrop())
+      level.push(new WaterDrop())
       level.push(new Stair())
 
       hero.arrayIndex = sprites.length-1
       
       function gameDraw(frame){
         canvas.width = canvas.width
-        level.forEach(e => e.draw())
+        level.filter(e => e.visible).forEach(e => e.draw())
         sprites.forEach(e => e.draw())
         requestAnimationFrame(gameDraw)
       }

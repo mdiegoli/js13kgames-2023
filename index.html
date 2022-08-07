@@ -32,6 +32,7 @@
           this.visible=true
           this.ts=0
           this.timeEffect=0
+          this.seedCounterEmoji=['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
         }
         //comunica anche se si sta usendo dalla scena
         collision(r1,x,y,s){
@@ -51,14 +52,14 @@
           let onStair = false; //use this variable to check if goUpAndDown is setted because I'm on stair or if it was setted previously
           for(let s = 0,l = level.length;s<l;s++){
             if (level[s].visible){
-              if (level[s].canGoThrough) { 
-                this.goUpAndDown = true; 
-                onStair = true;  
-                return {emoji:this.emoji,ret:false}
-              }
               let ret = this.collision(level[s],x,y,this.size)
               if(ret) {
                 console.log('collision between hero and level sprite #'+s)
+                if (level[s].canGoThrough) { 
+                  this.goUpAndDown = true; 
+                  onStair = true;  
+                  return {emoji:this.emoji,ret:false}
+                }
                 level[s].hitReaction()
                 return {emoji:level[s].getHitEmoji(this),ret:true}
               }
@@ -159,7 +160,31 @@
           context.stroke()
         }
       }
-      
+      class WaterMelon extends Sprite{
+        constructor(){
+          super()
+          this.size = emojiSize
+          this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
+          this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
+          this.emoji = '🍉'
+          this.reaction = {'😀':'💦'}   
+        }
+        hitReaction(){
+          this.visible=false
+        }
+        getHitEmoji(o){
+          if(o instanceof Hero){
+            o.seedCounter = 6
+            o.ts = 0
+            return o.seedCounterEmoji[o.seedCounter]
+          }
+        }
+        drawSprite(){
+          context.fillText(this.emoji, this.posx,this.posy+this.size-3)
+          context.rect(this.posx,this.posy,this.size,this.size)
+          context.stroke()
+        }
+      }
       class WaterDrop extends Sprite{
         constructor(){
           super()
@@ -176,7 +201,7 @@
           if(o instanceof Hero){
             o.ts = Date.now()
             o.timeEffect = 2
-            return '💦'
+            return '😓'
           }
         }
         drawSprite(){
@@ -222,7 +247,8 @@
           this.dir=''
           this.emoji = '😀'
           this.jumpSize = [-15,-10,-5,-2,-1,-1,-1,1,1,1,2,5,10,15]
-          
+          this.seedCounter = 0
+
           this.jumpSizeYield = function*(index) {
             while (index < this.jumpSize.length) {
               yield this.jumpSize[index]
@@ -269,6 +295,7 @@
       level.push(new BrownSquare())
       level.push(new WaterDrop())
       level.push(new Stair())
+      level.push(new WaterMelon())
 
       hero.arrayIndex = sprites.length-1
       

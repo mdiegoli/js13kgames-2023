@@ -98,9 +98,10 @@
         up(){
           let ret = this.hit(this.posx,this.posy-this.vel)
           if (ret.ret == false){
-            //this.defaultEmoji()
+            //ToDo:this.pick()
             this.posy-=this.vel
           }else{
+            //ToDo:this.notPick()
             this.emoji = ret.emoji
           }
           //else this.posy+=5

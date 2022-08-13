@@ -2,21 +2,35 @@
   <head>
     <style>
       * { margin:0; padding:0; } /* to remove the top and left whitespace */
+      #info{
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: -1;
+      }
     </style>
     <title>JS13KGAMES 2022</title>
 
   </head>
   <body>
-    <canvas id="myCanvas"></canvas>
+    <canvas id="myCanvas">
+    </canvas>
+    <canvas id="info"></canvas>
+    
     <script>
       let canvas = document.getElementById('myCanvas')
+      let info = document.getElementById('info')
+
       canvas.globalAlpha = 1
       let emojiSize = 25
       canvas.n_sprites_h = Math.trunc(window.innerHeight/emojiSize)
       canvas.n_sprites_w = Math.trunc(window.innerWidth/emojiSize)
       canvas.width = canvas.n_sprites_w * emojiSize
       canvas.height = canvas.n_sprites_h * emojiSize
+      info.width = canvas.n_sprites_w * emojiSize
+      info.height = canvas.n_sprites_h * emojiSize
       let context = canvas.getContext('2d')
+      let infoCtx = info.getContext('2d')
       var level = []
       function Utils(){
         return {
@@ -26,13 +40,14 @@
         }
       }
       class Sprite{
-        constructor(){
+        constructor(ctx){
           this.vel=5
           this.dir=''
           this.visible=true
           this.ts=0
           this.timeEffect=0
           this.seedCounterEmoji=['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
+          this.context = ctx
         }
         //comunica anche se si sta usendo dalla scena
         collision(r1,x,y,s){
@@ -49,7 +64,7 @@
         getHitEmoji(){}
         hit(x,y){
           if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return {emoji:this.emoji,ret:true}
-          let onStair = false; //use this variable to check if goUpAndDown is setted because I'm on stair or if it was setted previously
+          let onLadder = false; //use this variable to check if goUpAndDown is setted because I'm on Ladder or if it was setted previously
           for(let s = 0,l = level.length;s<l;s++){
             if (level[s].visible){
               let ret = this.collision(level[s],x,y,this.size)
@@ -57,7 +72,7 @@
                 console.log('collision between hero and level sprite #'+s)
                 if (level[s].canGoThrough) { 
                   this.goUpAndDown = true; 
-                  onStair = true;  
+                  onLadder = true;  
                   return {emoji:this.emoji,ret:false}
                 }
                 level[s].hitReaction()
@@ -76,7 +91,7 @@
             }
             
           }
-          if(this.goUpAndDown && !onStair) delete this.goUpAndDown
+          if(this.goUpAndDown && !onLadder) delete this.goUpAndDown
           return {emoji:this.emoji,ret:false}
           
         }
@@ -144,8 +159,8 @@
         }
         updatePosition(){}
         draw = function(){
-          context.font = this.size + 'px serif'
-          context.strokeStyle = 'black' 
+          this.context.font = this.size + 'px serif'
+          this.context.strokeStyle = 'black' 
           this.updatePosition()         
           this.drawSprite()
         }
@@ -155,14 +170,14 @@
             let diff = now-this.ts
             if(Math.round(diff/1000)>this.timeEffect) this.emoji = this.defaultEmoji()
           }
-          context.fillText(this.emoji, this.posx-4,this.posy+this.size-3)
-          context.rect(this.posx,this.posy,this.size,this.size)
-          context.stroke()
+          this.context.fillText(this.emoji, this.posx-4,this.posy+this.size-3)
+          this.context.rect(this.posx,this.posy,this.size,this.size)
+          this.context.stroke()
         }
       }
       class WaterMelon extends Sprite{
-        constructor(){
-          super()
+        constructor(ctx){
+          super(ctx)
           this.size = emojiSize
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
@@ -180,14 +195,14 @@
           }
         }
         drawSprite(){
-          context.fillText(this.emoji, this.posx,this.posy+this.size-3)
-          context.rect(this.posx,this.posy,this.size,this.size)
-          context.stroke()
+          this.context.fillText(this.emoji, this.posx,this.posy+this.size-3)
+          this.context.rect(this.posx,this.posy,this.size,this.size)
+          this.context.stroke()
         }
       }
       class WaterDrop extends Sprite{
-        constructor(){
-          super()
+        constructor(ctx){
+          super(ctx)
           this.size = emojiSize
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
@@ -205,14 +220,14 @@
           }
         }
         drawSprite(){
-          context.fillText(this.emoji, this.posx,this.posy+this.size-3)
-          context.rect(this.posx,this.posy,this.size,this.size)
-          context.stroke()
+          this.context.fillText(this.emoji, this.posx,this.posy+this.size-3)
+          this.context.rect(this.posx,this.posy,this.size,this.size)
+          this.context.stroke()
         }
       }
-      class Stair extends Sprite{
-        constructor(){
-          super()
+      class Ladder extends Sprite{
+        constructor(ctx){
+          super(ctx)
           this.size = emojiSize
           this.canGoThrough=true
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
@@ -222,8 +237,8 @@
       }
       
       class BrownSquare extends Sprite{
-        constructor(){
-          super()
+        constructor(ctx){
+          super(ctx)
           this.size = emojiSize
           this.posy = canvas.height-this.size//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
           this.posx = Utils().random(0,Math.trunc(canvas.width/this.size)-1)*this.size
@@ -239,8 +254,8 @@
         }
       }
       class Hero extends Sprite{
-        constructor(){
-          super()
+        constructor(ctx){
+          super(ctx)
           this.size = emojiSize
           this.posx = 0
           this.posy = canvas.height-this.size
@@ -290,12 +305,14 @@
 
       }
       let sprites = []
-      let hero = new Hero()
+      let hero = new Hero(context)
       sprites.push(hero)
-      level.push(new BrownSquare())
-      level.push(new WaterDrop())
-      level.push(new Stair())
-      level.push(new WaterMelon())
+      level.push(new BrownSquare(context))
+      level.push(new WaterDrop(context))
+      level.push(new Ladder(context))
+      level.push(new WaterMelon(context))
+      level.push(new WaterMelon(infoCtx))
+
 
       hero.arrayIndex = sprites.length-1
       

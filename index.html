@@ -5,7 +5,7 @@
       #info{
         position: absolute;
         left: 0px;
-        top: 0px;
+        /*top: 0px;*/
         z-index: -1;
       }
     </style>
@@ -13,22 +13,25 @@
 
   </head>
   <body>
-    <canvas id="myCanvas">
-    </canvas>
+    <canvas id="bar"></canvas>
+    <canvas id="myCanvas"></canvas>
     <canvas id="info"></canvas>
     
     <script>
       let canvas = document.getElementById('myCanvas')
       let info = document.getElementById('info')
+      let bar = document.getElementById('bar')
 
       canvas.globalAlpha = 1
       let emojiSize = 25
       canvas.n_sprites_h = Math.trunc(window.innerHeight/emojiSize)
       canvas.n_sprites_w = Math.trunc(window.innerWidth/emojiSize)
-      canvas.width = canvas.n_sprites_w * emojiSize
-      canvas.height = canvas.n_sprites_h * emojiSize
-      info.width = canvas.n_sprites_w * emojiSize
-      info.height = canvas.n_sprites_h * emojiSize
+      canvas.width = info.width = bar.width = (canvas.n_sprites_w * emojiSize)
+      canvas.height = (canvas.n_sprites_h-1) * emojiSize
+      let spazioPerSacchetto = (window.innerHeight - canvas.height)
+      info.height = (canvas.n_sprites_h-1) * emojiSize
+      bar.height = spazioPerSacchetto
+      info.style.top = spazioPerSacchetto
       let context = canvas.getContext('2d')
       let infoCtx = info.getContext('2d')
       var level = []

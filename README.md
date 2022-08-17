@@ -8,3 +8,4 @@ https://unicode.org/emoji/charts/full-emoji-list.html
 
 http://gcctech.org/csc/javascript/javascript_keycodes.htm
 
+ToDo: change of emoji while seed runs

@@ -89,8 +89,8 @@
               return false
             }
         }
-        hitReaction(){}
-        getHitEmoji(){}
+        hitReaction(){}//decido cosa succede quando lo sprite viene colpito
+        getHitEmoji(){}//l'oggetto che mi colpisce che emoji avrà?
         hit(x,y){
           if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return {emoji:this.emoji,ret:true}
           let onLadder = false; //use this variable to check if goUpAndDown is setted because I'm on Ladder or if it was setted previously
@@ -197,11 +197,17 @@
           this.updatePosition()         
           this.drawSprite(x,y)
         }
+        whatHappenAfterCollisionTS(){
+          this.emoji = this.defaultEmoji()
+        }
         drawSprite(x,y){
           if(this.ts){
             let now = Date.now()
             let diff = now-this.ts
-            if(Math.round(diff/1000)>this.timeEffect) this.emoji = this.defaultEmoji()
+            if(Math.round(diff/1000)>this.timeEffect) {
+              this.ts = 0
+              this.whatHappenAfterCollisionTS()
+            }
           }
           if(x)this.posx=x
           if(y)this.posy=y
@@ -217,7 +223,6 @@
           this.posy = y
           this.posx = x
           this.emoji = '🟤'
-          this.reaction = {'🟫':'💥'}
           this.dir = ''
         }
         updatePosition(){
@@ -230,8 +235,8 @@
               break
           }    
         }
-        getHitEmoji(o){
-         return '💥'
+        whatHappenAfterCollisionTS(){
+          this.visible = false
         }
 
       }
@@ -243,7 +248,6 @@
           this.posy = y
           this.posx = x
           this.emoji = '🍉'
-          this.reaction = {'😀':'💦'}   
         }
         hitReaction(){
           this.visible=false
@@ -273,15 +277,14 @@
           this.posy = y
           this.posx = x
           this.emoji = '💧'
-          this.reaction = {'😀':'💦'}
         }
         hitReaction(){
           this.visible=false
         }
         getHitEmoji(o){
-          if(o instanceof Hero){
-            o.ts = Date.now()
-            o.timeEffect = 2
+          if(o instanceof Hero){//hit by hero
+            o.ts = Date.now()//set ts
+            o.timeEffect = 2//time render of the emoji setted below
             return '😓'
           }
         }
@@ -309,15 +312,15 @@
           this.posy = y
           this.posx = x
           this.emoji = '🟫'
-          this.reaction = {'😀':'😵'}
         }
         getHitEmoji(o){
+          if(!o.ts)o.ts = Date.now()
           if(o instanceof Hero){
-            o.ts=Date.now()
             o.timeEffect = 3
             return '😵'
           }
           if(o instanceof Seed){
+            o.timeEffect = 1//time render of explosion
             return '💥'
           }
         }
@@ -382,14 +385,14 @@
       posy = canvas.height-emojiSize//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
       posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       level.push(new BrownSquare(context,posx,posy))
-      posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      level.push(new WaterDrop(context,posx,posy))
-      posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      level.push(new Ladder(context,posx,posy))
+      //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
+      //level.push(new WaterDrop(context,posx,posy))
+      //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
+      //level.push(new Ladder(context,posx,posy))
       posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       level.push(new WaterMelon(context,posx,posy))
-      posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      level.push(new WaterMelon(infoCtx,posx,posy))
+      //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
+      //level.push(new WaterMelon(infoCtx,posx,posy))
 
       //barEl.add(new WaterMelon(barCtx,0,0))
 
@@ -399,7 +402,7 @@
       function gameDraw(frame){
         canvas.width = canvas.width
         level.filter(e => e.visible).forEach(e => e.draw())
-        sprites.forEach(e => e.draw())
+        sprites.filter(e => e.visible).forEach(e => e.draw())
         barEl.draw()
         requestAnimationFrame(gameDraw)
       }

@@ -6,6 +6,8 @@ https://blog.jakuba.net/2018-01-28-lets-write-a-2d-platformer-from-scratch-part-
 
 https://unicode.org/emoji/charts/full-emoji-list.html
 
+coffin,funeral urn,skull and crossbones,angry face,ogre,goblin,ghost,alien,dragon,vampire
+
 http://gcctech.org/csc/javascript/javascript_keycodes.htm
 
 ToDo: change of emoji while seed runs

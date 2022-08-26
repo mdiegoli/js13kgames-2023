@@ -231,7 +231,7 @@
           this.size = emojiSize
           this.posy = y
           this.posx = x
-          this.emoji = '🟤'
+          this.emoji = '🦴'
           this.dir = ''
         }
         updatePosition(){
@@ -250,13 +250,13 @@
 
       }
       
-      class WaterMelon extends Sprite{
+      class Bone extends Sprite{
         constructor(ctx,x,y){
           super(ctx)
           this.size = emojiSize
           this.posy = y
           this.posx = x
-          this.emoji = '🍉'
+          this.emoji = '🦴'
         }
         hitReaction(){
           this.visible=false
@@ -314,19 +314,19 @@
         }
       }
       
-      class BrownSquare extends Sprite{
+      class headstone extends Sprite{
         constructor(ctx,x,y){
           super(ctx)
           this.size = emojiSize
           this.posy = y
           this.posx = x
-          this.emoji = '🟫'
+          this.emoji = '🪦'
         }
         getHitEmoji(o){
           if(!o.ts)o.ts = Date.now()
           if(o instanceof Hero){
             o.timeEffect = 3
-            return '😵'
+            return '💀'
           }
           if(o instanceof Seed){
             o.timeEffect = 1//time render of explosion
@@ -358,7 +358,7 @@
           return '💀'
         }
         hitEmoji(){
-          this.emoji = '😵'
+          this.emoji = '💀'
         }
         updatePosition(){
           switch(this.dir){
@@ -393,17 +393,17 @@
       sprites.push(hero)
       posy = canvas.height-emojiSize//Utils().random(0,Math.trunc(canvas.height/this.size)-1)*this.size
       posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      level.push(new BrownSquare(context,posx,posy))
+      level.push(new headstone(context,posx,posy))
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       //level.push(new WaterDrop(context,posx,posy))
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       //level.push(new Ladder(context,posx,posy))
       posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      level.push(new WaterMelon(context,posx,posy))
+      level.push(new Bone(context,posx,posy))
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      //level.push(new WaterMelon(infoCtx,posx,posy))
+      //level.push(new Bone(infoCtx,posx,posy))
 
-      //barEl.add(new WaterMelon(barCtx,0,0))
+      //barEl.add(new Bone(barCtx,0,0))
 
 
       hero.arrayIndex = sprites.length-1
@@ -422,11 +422,10 @@
         if (e.keyCode == '38') {
             hero.dir = 'u'// up arrow
             hero.oldDir = 'u'
-        }
-        else if (e.keyCode == '40') {
+        }/*else if (e.keyCode == '40') {
             hero.dir = 'd'// down arrow
             hero.oldDir = 'd'
-        }
+        }*/
         else if (e.keyCode == '37') {
             hero.dir = 'l'// left arrow
             hero.oldDir = 'l'

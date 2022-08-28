@@ -10,25 +10,25 @@
 
 <body>
 
+<!--
+
 <p>Type letters from "a" to "z" in the field to hear the corresponding note.
-<br>Press PLAY to play the whole string.
 <br>The character "0" represents a silence.
-<br>Use the second field to compose a second track.
-<br>
-<hr>
-<br>
+
 <p style="font-family: consolas, monospace">Scala.....: ab<b>cdefghij</b>klmnopqrstuvwxyz (c=DO d=RE e=MI f=FA SOL=g LA=h SI=i DO=j)</p>
 <p style="font-family: consolas, monospace">FraMartino: ffgghhff0ffgghhff0hhiijjjj0kjihfj0kjihfj0ffccff0ffccff [0.2]</p>
 <p style="font-family: consolas, monospace">WeRockYou1: kllk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk00 [0.2]</p>
 <p style="font-family: consolas, monospace">.........2: ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0</p>
 
+-->
+
 <br>
 
-1) <input id=i1 value="miffif00mifbfh00heaehe00ifffif00iheaehefffff" size=80>
+<textarea name=i1 id=i1 cols="40" rows="3">miffif00mifbfh00heaehe00ifffif00iheaehefffff</textarea>
 <input type="checkbox" id="checkbox_i1" onClick="click_checkbox_track(this.id,'checkbox_i2')" checked>
 <br>
 <br>
-2) <input id=i2 value="aaabbb00aaabbc00aaabbb00aaabbc00aaabbcccbbbb" size=80>
+<textarea name=i2 id=i2 cols="40" rows="3">aaabbb00aaabbc00aaabbb00aaabbc00aaabbcccbbbb</textarea>
 <input type="checkbox" id="checkbox_i2" onClick="click_checkbox_track(this.id,'checkbox_i1')">
 <br>
 <br>
@@ -107,7 +107,6 @@ lenDecr.onclick = () => {
   len.value=num2dec;
 }
 
-
 play.onclick = () => {
   P(i1.value,.3);
   P(i2.value,.3);
@@ -160,7 +159,7 @@ function click_checkbox_track(clicked_checkbox,other_checkbox) {
 input { font-family: courier, monospace }
 
 .bottoneNota
-{ width: 40px 
+{ width: 37px 
 }
 
 </style>

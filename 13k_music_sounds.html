@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13k_Music_Sounds</title>
+</head>
+
+<body>
+
+<p>Type letters from "a" to "z" in the field to hear the corresponding note.
+<br>Press PLAY to play the whole string.
+<br>The character "0" represents a silence.
+<br>Use the second field to compose a second track.
+<br>
+<hr>
+<br>
+<p style="font-family: consolas, monospace">Scala.....: ab<b>cdefghij</b>klmnopqrstuvwxyz (c=DO d=RE e=MI f=FA SOL=g LA=h SI=i DO=j)</p>
+<p style="font-family: consolas, monospace">FraMartino: ffgghhff0ffgghhff0hhiijjjj0kjihfj0kjihfj0ffccff0ffccff [0.2]</p>
+<p style="font-family: consolas, monospace">WeRockYou1: kllk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk00 [0.2]</p>
+<p style="font-family: consolas, monospace">.........2: ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0</p>
+
+<br>
+
+1) <input id=i1 value="miffif00mifbfh00heaehe00ifffif00iheaehefffff" size=80>
+<input type="checkbox" id="checkbox_i1" onClick="click_checkbox_track(this.id,'checkbox_i2')" checked>
+<br>
+<br>
+2) <input id=i2 value="aaabbb00aaabbc00aaabbb00aaabbc00aaabbcccbbbb" size=80>
+<input type="checkbox" id="checkbox_i2" onClick="click_checkbox_track(this.id,'checkbox_i1')">
+<br>
+<br>
+
+<!-- Tastiera -->
+<button id=nc class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<button id=nd class="bottoneNota" onClick="nota_click(this.id)">RE</button>
+<button id=ne class="bottoneNota" onClick="nota_click(this.id)">MI</button>
+<button id=nf class="bottoneNota" onClick="nota_click(this.id)">FA</button>
+<button id=ng class="bottoneNota" onClick="nota_click(this.id)">SOL</button>
+<button id=nh class="bottoneNota" onClick="nota_click(this.id)">LA</button>
+<button id=ni class="bottoneNota" onClick="nota_click(this.id)">SI</button>
+<button id=nj class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<br><br>
+<button id=nj class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<button id=nk class="bottoneNota" onClick="nota_click(this.id)">RE</button>
+<button id=nl class="bottoneNota" onClick="nota_click(this.id)">MI</button>
+<button id=nm class="bottoneNota" onClick="nota_click(this.id)">FA</button>
+<button id=nn class="bottoneNota" onClick="nota_click(this.id)">SOL</button>
+<button id=no class="bottoneNota" onClick="nota_click(this.id)">LA</button>
+<button id=np class="bottoneNota" onClick="nota_click(this.id)">SI</button>
+<button id=nq class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<br><br>
+<button id=nq class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<button id=nr class="bottoneNota" onClick="nota_click(this.id)">RE</button>
+<button id=ns class="bottoneNota" onClick="nota_click(this.id)">MI</button>
+<button id=nt class="bottoneNota" onClick="nota_click(this.id)">FA</button>
+<button id=nu class="bottoneNota" onClick="nota_click(this.id)">SOL</button>
+<button id=nv class="bottoneNota" onClick="nota_click(this.id)">LA</button>
+<button id=nw class="bottoneNota" onClick="nota_click(this.id)">SI</button>
+<button id=nx class="bottoneNota" onClick="nota_click(this.id)">DO</button>
+<br><br>
+<button id=n0 onClick="nota_click(this.id)">PAUSA</button>
+<button id=canc_nota onClick="canc_nota()"><<<</button>
+<button id=reset_traccia onClick="reset_traccia()">RESET TRACCIA</button>
+<br><br>
+
+Note length: <input id=len value=0.3 size=4>
+<button id=lenIncr>+</button>
+<button id=lenDecr>-</button>
+<br><br>
+
+<button id=play>PLAY</button>
+<br><br>
+
+<hr>
+<br>
+
+<script>
+P = (D,delay) => {
+  if(D){         // D = melody string (a-z + 0 for silence)
+    I=+len.value; // I = note length in seconds
+    with(new AudioContext)
+    with(G=createGain())
+    for(i=0;i<D.length;i++)
+    with(createOscillator())
+    if(D[i=+i]&&D[i]!="0")
+    connect(G),
+    G.connect(destination),
+    start(i*I+delay),
+    frequency.setValueAtTime(440*1.06**(-105+D.charCodeAt(i)),i*I+delay),
+    type='sine',
+    gain.setValueAtTime(.5,i*I+delay),
+    gain.setTargetAtTime(.001,i*I+delay+.1,.05),
+    stop(i*I+delay+I-.01);
+  }
+}
+
+lenIncr.onclick = () => {
+  num2dec=(parseFloat(len.value)+0.05).toFixed(2);
+  len.value=num2dec;
+}
+
+lenDecr.onclick = () => {
+  num2dec=(parseFloat(len.value)-0.05).toFixed(2);
+  len.value=num2dec;
+}
+
+
+play.onclick = () => {
+  P(i1.value,.3);
+  P(i2.value,.3);
+}
+
+i1.oninput = i2.oninput = e => {
+  P(e.data[0],0);
+}
+
+function nota_click(btn_id) {
+  nota=btn_id.substr(1,1);
+  objTrackSel=trackSel();
+  objTrackSel.value+=nota;
+  P(nota,0);
+}
+
+function canc_nota() {
+  objTrackSel=trackSel();
+  objTrackSel.value=objTrackSel.value.slice(0,-1);
+}
+
+function reset_traccia() {
+  objTrackSel=trackSel();
+  objTrackSel.value="";
+}
+
+function trackSel() {
+  if (document.getElementById('checkbox_i1').checked) {
+    return document.getElementById('i1')
+  } else {
+    return document.getElementById('i2')
+  }
+}
+
+function click_checkbox_track(clicked_checkbox,other_checkbox) {
+  objClickChkBox=document.getElementById(clicked_checkbox);
+  objOtherChkBox=document.getElementById(other_checkbox);
+
+  if (objClickChkBox.checked) {
+    objOtherChkBox.checked=false;
+  } else {
+    objOtherChkBox.checked=true;
+  }
+
+}
+
+</script>
+
+<style>
+input { font-family: courier, monospace }
+
+.bottoneNota
+{ width: 40px 
+}
+
+</style>
+    
+</body>
+</html>

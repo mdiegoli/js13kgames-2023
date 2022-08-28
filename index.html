@@ -103,16 +103,19 @@
         hit(x,y){
           if (x<0||y<0||(x+this.size)>canvas.width||(y+this.size)>canvas.height) return {emoji:this.emoji,ret:true}
           let onLadder = false; //use this variable to check if goUpAndDown is setted because I'm on Ladder or if it was setted previously
+          this.goUpAndDown = false
+          console.log(this)
           for(let s = 0,l = level.length;s<l;s++){
             if (level[s].visible){
               let ret = this.collision(level[s],x,y,this.size)
               if(ret) {
                 console.log('collision between hero and level sprite #'+s)
                 if (level[s].canGoThrough) { 
-                  this.goUpAndDown = true; 
-                  onLadder = true;  
+                  this.goUpAndDown = true
+                  onLadder = true  
                   return {emoji:this.emoji,ret:false}
                 }
+              
                 level[s].hitReaction()
                 return {emoji:level[s].getHitEmoji(this),ret:true}
               }
@@ -132,20 +135,30 @@
             
             
           }
-          if(this.goUpAndDown && !onLadder) delete this.goUpAndDown
+          console.log(this.goUpAndDown, onLadder)
+          if(this.goUpAndDown && !onLadder){
+            delete this.goUpAndDown
+            
+          } 
+          if(!this.goUpAndDown && !onLadder && this.dir == 'u'){
+            if(!this.doOneStep){
+              this.doOneStep = true
+              return {emoji:this.emoji,ret:false}
+            }else{
+              return {emoji:this.emoji,ret:true}    
+            }
+            
+          }
           return {emoji:this.emoji,ret:false}
           
         }
         up(){
           let ret = this.hit(this.posx,this.posy-this.vel)
           if (ret.ret == false){
-            //ToDo:this.pick()
             this.posy-=this.vel
           }else{
-            //ToDo:this.notPick()
             this.emoji = ret.emoji
           }
-          //else this.posy+=5
         }
         down(){
           let ret = this.hit(this.posx,this.posy+this.vel)
@@ -334,6 +347,26 @@
           }
         }
       }
+      class brick extends Sprite{
+        constructor(ctx,x,y){
+          super(ctx)
+          this.size = emojiSize
+          this.posy = y
+          this.posx = x
+          this.emoji = '🧱'
+        }
+        getHitEmoji(o){
+          if(!o.ts)o.ts = Date.now()
+          if(o instanceof Hero){
+            o.timeEffect = 3
+            return '💀'
+          }
+          if(o instanceof Seed){
+            o.timeEffect = 1//time render of explosion
+            return '💥'
+          }
+        }
+      }
       class Hero extends Sprite{
         constructor(ctx,x,y){
           super(ctx)
@@ -397,7 +430,11 @@
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       //level.push(new WaterDrop(context,posx,posy))
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
-      //level.push(new Ladder(context,posx,posy))
+      level.push(new Ladder(context,posx+25,posy))
+      level.push(new Ladder(context,posx+25,posy-25))
+      level.push(new brick(context,posx+50,posy-25))
+      level.push(new Ladder(context,posx+25,posy-50))
+
       posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
       level.push(new Bone(context,posx,posy))
       //posx = Utils().random(0,Math.trunc(canvas.width/emojiSize)-1)*emojiSize
@@ -417,11 +454,12 @@
       }
 
       function keydown(e){
-        e = e || window.event;
-
+        e = e || window.event
         if (e.keyCode == '38') {
+          //if(hero.goUpAndDown){
             hero.dir = 'u'// up arrow
             hero.oldDir = 'u'
+          //}
         }/*else if (e.keyCode == '40') {
             hero.dir = 'd'// down arrow
             hero.oldDir = 'd'

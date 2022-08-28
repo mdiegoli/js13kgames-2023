@@ -10,4 +10,4 @@ coffin,funeral urn,skull and crossbones,angry face,ogre,goblin,ghost,alien,drago
 
 http://gcctech.org/csc/javascript/javascript_keycodes.htm
 
-ToDo: change of emoji while seed runs
+ToDo: pick problem: when hero is between different icons, hit test works bad

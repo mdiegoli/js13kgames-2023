@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+  
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,15 +11,10 @@
 <body>
 
 <!--
-
-<p>Type letters from "a" to "z" in the field to hear the corresponding note.
-<br>The character "0" represents a silence.
-
 <p style="font-family: consolas, monospace">Scala.....: ab<b>cdefghij</b>klmnopqrstuvwxyz (c=DO d=RE e=MI f=FA SOL=g LA=h SI=i DO=j)</p>
 <p style="font-family: consolas, monospace">FraMartino: ffgghhff0ffgghhff0hhiijjjj0kjihfj0kjihfj0ffccff0ffccff [0.2]</p>
 <p style="font-family: consolas, monospace">WeRockYou1: kllk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk0llk0ll0kllk0llk00 [0.2]</p>
 <p style="font-family: consolas, monospace">.........2: ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0ababbabba0</p>
-
 -->
 
 <br>
@@ -66,7 +61,7 @@
 <button id=reset_traccia onClick="reset_traccia()">RESET TRACCIA</button>
 <br><br>
 
-Note length: <input id=len value=0.3 size=4>
+Durata: <input id=len value=0.3 size=4>
 <button id=lenIncr>+</button>
 <button id=lenDecr>-</button>
 <br><br>
@@ -74,10 +69,54 @@ Note length: <input id=len value=0.3 size=4>
 <button id=play>PLAY</button>
 <br><br>
 
-<hr>
-<br>
+<input type="file" name="myfile" id="myfile" />
+<button id=salva>SALVA</button>
+
+<script src="main.js"></script>
+<script src="node_modules/file-saver/src/FileSaver.js"></script>
 
 <script>
+
+let file = document.getElementById("myfile");
+
+file.addEventListener("change", function () {
+  var reader = new FileReader();
+  var riga1 = "";
+  var riga2 = "";
+  var durata = 0.3;
+  reader.onload = function (progressEvent) {
+    //console.log(this.result);
+    righe = this.result.split('\r\n');
+    if (righe.length > 0) {
+      riga1 = righe[0];
+    }
+    if (righe.length > 1) {
+      riga2 = righe[1];
+    }
+    if (righe.length > 2) {
+      durata = righe[2];
+    }
+    document.getElementById('i1').value = riga1;
+    document.getElementById('i2').value = riga2;
+    document.getElementById('len').value = durata;
+  };
+  reader.readAsText(this.files[0]);
+});
+
+salva.onclick = () => {  
+  saveDynamicDataToFile();
+}
+
+function saveDynamicDataToFile() {
+let file = document.getElementById("myfile");
+var crlf = String.fromCharCode(13) + String.fromCharCode(10);
+var userInput = document.getElementById("i1").value + crlf +
+                document.getElementById("i2").value + crlf +
+                document.getElementById('len').value;
+var blob = new Blob([userInput], { type: "text/plain;charset=utf-8" });
+saveAs(blob, file.files[0].name);
+}
+
 P = (D,delay) => {
   if(D){         // D = melody string (a-z + 0 for silence)
     I=+len.value; // I = note length in seconds
@@ -156,6 +195,7 @@ function click_checkbox_track(clicked_checkbox,other_checkbox) {
 </script>
 
 <style>
+
 input { font-family: courier, monospace }
 
 .bottoneNota

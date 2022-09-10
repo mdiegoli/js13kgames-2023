@@ -1,5 +1,18 @@
-import Phaser from 'phaser';
-import bomb from './assets/bomb.png';
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 10</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
 
 var config = {
     type: Phaser.AUTO,
@@ -32,11 +45,11 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    this.load.image('sky', 'src/assets/sky.png');
-    this.load.image('ground', 'src/assets/platform.png');
-    this.load.image('star', 'src/assets/star.png');
-    this.load.image('bomb', 'src/assets/bomb.png');
-    this.load.spritesheet('dude', 'src/assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.image('sky', 'assets/sky.png');
+    this.load.image('ground', 'assets/platform.png');
+    this.load.image('star', 'assets/star.png');
+    this.load.image('bomb', 'assets/bomb.png');
+    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
 
 function create ()
@@ -187,3 +200,8 @@ function hitBomb (player, bomb)
 
     gameOver = true;
 }
+
+</script>
+
+</body>
+</html>

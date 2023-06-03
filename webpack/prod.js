@@ -9,9 +9,8 @@ module.exports = merge(base, {
     filename: "bundle.min.js"
   },
   devtool: false,
-  performance: {
-    maxEntrypointSize: 900000,
-    maxAssetSize: 900000
+  performance : {
+    hints : false
   },
   optimization: {
     minimizer: [

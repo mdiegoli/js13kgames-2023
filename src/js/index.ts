@@ -7,7 +7,7 @@ const config: Phaser.Types.Core.GameConfig = {
   width: 256,
   height: 224,
   pixelArt: true,
-  zoom: 2,
+  zoom: 3,
   input: {
     keyboard: true,
     gamepad: true,

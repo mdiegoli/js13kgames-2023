@@ -6,7 +6,6 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: 256,
   height: 224,
-  pixelArt: true,
   zoom: 3,
   input: {
     keyboard: true,
